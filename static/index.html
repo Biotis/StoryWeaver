@@ -4,22 +4,31 @@
     <meta charset="UTF-8">
     <title>AI StoryWeaver</title>
     <style>
-        body { font-family: 'Arial', sans-serif; margin: 40px; text-align: center; background: #fafafa; }
-        input[type=text] { width: 60%; padding: 10px; font-size: 16px; }
-        button { padding: 10px 20px; font-size: 16px; margin-top: 10px; cursor: pointer; }
+        body { font-family: 'Pretendard', 'Arial', sans-serif; margin: 40px; text-align: center; background: #fafafa; color: #333; }
+        input[type=text] { width: 60%; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 8px; }
+        button { padding: 10px 20px; font-size: 16px; margin-top: 10px; cursor: pointer; background-color: #4CAF50; color: white; border: none; border-radius: 6px; }
+        button:hover { background-color: #45a049; }
         img { margin-top: 15px; max-width: 512px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        .story { margin-top: 30px; font-size: 18px; color: #333; max-width: 700px; margin-left: auto; margin-right: auto; text-align: left; }
+        .story { margin-top: 30px; font-size: 18px; max-width: 700px; margin-left: auto; margin-right: auto; text-align: left; }
         .page { margin-bottom: 50px; border-bottom: 1px solid #ddd; padding-bottom: 30px; }
-        .error { color: red; }
+        .error { color: red; margin-top: 20px; font-weight: bold; }
         .image-desc { font-style: italic; color: #555; margin-top: 5px; }
+        .loading { color: #777; font-style: italic; }
     </style>
+    <script>
+        // ### 수정: 간단한 로딩 메시지 추가
+        function showLoading() {
+            const form = document.querySelector("form");
+            form.innerHTML += '<p class="loading">🎨 생성 중입니다... 잠시만 기다려주세요.</p>';
+        }
+    </script>
 </head>
 <body>
     <h1>🌟 AI StoryWeaver</h1>
-    <form action="/generate" method="post">
-        <input type="text" name="prompt" placeholder="예: 용사가 드래곤을 무찌르는 상황" required>
+    <form action="/generate" method="post" onsubmit="showLoading()">
+        <input type="text" name="prompt" placeholder="예: 용사가 드래곤을 무찌르는 이야기" required>
         <br>
-        <button type="submit">Generate Story</button>
+        <button type="submit">이야기 만들기</button>
     </form>
 
     {% if error %}
@@ -28,10 +37,10 @@
 
     {% if result %}
         <div class="story">
-            <h3>Prompt:</h3>
+            <h3>주제:</h3>
             <p>{{ result.prompt }}</p>
 
-            <h3>Generated Story:</h3>
+            <h3>생성된 동화:</h3>
             {% for page in result.pages %}
                 <div class="page">
                     <h4>{{ page.page_title }}</h4>
