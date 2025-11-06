@@ -9,13 +9,13 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 import markdown
 
-# ✅ 환경 변수 로드
+# 환경 변수 로드
 load_dotenv()
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
 app = FastAPI()
 
-# ✅ 정적 폴더 연결
+# 정적 폴더 연결
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="static")
 
@@ -30,7 +30,7 @@ async def generate(request: Request, prompt: str = Form(...)):
     try:
         story_model = genai.GenerativeModel("gemini-2.5-flash")
 
-        # ✅ Gemini에 보낼 프롬프트 (한국어 스토리 + 삽화 설명 포함)
+        # Gemini에 보낼 프롬프트
         story_prompt = f"""
         아래 주제를 바탕으로 어린이용 그림책 스타일의 스토리를 작성하세요.
         - 주제: "{prompt}"
@@ -48,7 +48,7 @@ async def generate(request: Request, prompt: str = Form(...)):
         story_response = story_model.generate_content(story_prompt)
         story_text = story_response.text.strip()
 
-        # ✅ 페이지별 분리
+        # 페이지별 분리
         page_blocks = re.split(r'(?=\d+\.\s*페이지)', story_text)
         pages = []
 
@@ -56,7 +56,7 @@ async def generate(request: Request, prompt: str = Form(...)):
             if not block.strip():
                 continue
 
-            # 삽화 설명 추출 (한국어)
+            # 삽화 설명 추출
             match = re.search(r'삽화:\s*(.*)\)', block)
             image_prompt_ko = match.group(1).strip() if match else None
 
@@ -68,7 +68,7 @@ async def generate(request: Request, prompt: str = Form(...)):
                 try:
                     image_model = genai.GenerativeModel("gemini-2.5-flash-image")
 
-                    # ✅ 한국어 프롬프트 그대로 전달 (명확히 스타일 지정)
+                    # 한국어 프롬프트 그대로 전달
                     img_response = image_model.generate_content([
                         f"동화책 스타일의 일러스트, 따뜻한 색감, 수채화 느낌, {image_prompt_ko}"
                     ])
